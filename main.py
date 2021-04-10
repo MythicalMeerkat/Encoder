@@ -99,6 +99,18 @@ def fifteen_level_gray_decoding(imageArr, width, height):
                 imageArr[x, y] = 253
 
 
+def generate_error_image(error_arr, orig_image, decoded_image, width, height):
+    max_val = 1
+    for x in range(width):
+        for y in range(height):
+            value = abs(int(orig_image[x, y]) - int(decoded_image[x, y]))
+            if value > max_val:
+                max_val = value
+            error_arr[x, y] = value
+
+    return max_val
+
+
 # Read .pgma image into Numpy Array
 image_original = cv2.imread('baboon.pgma', -1)
 image_2_Gray = cv2.imread('baboon.pgma', -1)
@@ -189,6 +201,44 @@ with open(filename, "r+b") as file:
     file.write(pgmHeader_byte)
 file.close()
 
+# Error Image Processing for 2 Levels
+image_2_Error = image_original
+image_2_Encoded = cv2.imread('baboon2-levels.pgm', -1)
+image_2_Decoded = cv2.imread('baboon2-levels-R.pgm', -1)
+
+max_value = generate_error_image(image_2_Error, image_original, image_2_Decoded, width, height)
+
+pgmHeader = 'P5' + '\n' + str(width) + ' ' + str(height) + '\n' + str(max_value) + '\n' + '\n'
+pgmHeader_byte = bytearray(pgmHeader, 'utf-8')
+filename = "baboon2-levels-ERROR.pgm"
+
+print('Printing Image: ' + str(filename))
+cv2.imwrite(filename, image_2_Error)
+
+# Replace header in generated .pgm file
+with open(filename, "r+b") as file:
+    file.write(pgmHeader_byte)
+file.close()
+
+
+# Error Image Processing for 15 Levels
+image_15_Error = image_original
+image_15_Encoded = cv2.imread('baboon15-levels.pgm', -1)
+image_15_Decoded = cv2.imread('baboon15-levels-R.pgm', -1)
+
+max_value = generate_error_image(image_15_Error, image_original, image_15_Decoded, width, height)
+
+pgmHeader = 'P5' + '\n' + str(width) + ' ' + str(height) + '\n' + str(max_value) + '\n' + '\n'
+pgmHeader_byte = bytearray(pgmHeader, 'utf-8')
+filename = "baboon15-levels-ERROR.pgm"
+
+print('Printing Image: ' + str(filename))
+cv2.imwrite(filename, image_15_Error)
+
+# Replace header in generated .pgm file
+with open(filename, "r+b") as file:
+    file.write(pgmHeader_byte)
+file.close()
 
 
 
